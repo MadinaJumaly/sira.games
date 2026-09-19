@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Сира Жеопарди</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Manrope:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a0a0a;
+    --board-border:#7c5cff;
+    --board-border-glow:#7c5cff88;
+    --label-text:#f5f5f5;
+    --col1-a:#8CF2B8; --col1-b:#5FE3A0;
+    --col2-a:#E7F27A; --col2-b:#D6E84A;
+    --col3-a:#F6C64B; --col3-b:#F0A93A;
+    --col4-a:#F58A3D; --col4-b:#EE6A2A;
+    --col5-a:#E5493C; --col5-b:#C22E27;
+    --cell-text:#1a1207;
+    --gap:6px;
+    --modal-bg:#141018;
+    --modal-border:#7c5cff;
+    --answer-bg:#233d2b;
+    --answer-border:#3fae6a;
+    --font-display:'Baloo 2', 'Manrope', system-ui, sans-serif;
+    --font-body:'Manrope', system-ui, sans-serif;
+  }
+  :root:not([data-theme="light"]){ --bg:#0a0a0a; }
+  :root[data-theme="dark"]{ --bg:#0a0a0a; }
+
+  *{ box-sizing:border-box; }
+  html,body{
+    margin:0; padding:0;
+    background:var(--bg);
+    color:var(--label-text);
+    font-family:var(--font-body);
+    min-height:100%;
+  }
+
+  .wrap{
+    max-width:1200px;
+    margin:0 auto;
+    padding:28px 16px 48px;
+  }
+
+  .title{
+    text-align:center;
+    font-family:var(--font-display);
+    font-weight:800;
+    font-size:clamp(1.6rem, 4vw, 2.6rem);
+    letter-spacing:0.5px;
+    margin:0 0 4px;
+    color:#fff;
+  }
+  .subtitle{
+    text-align:center;
+    color:#a99fc9;
+    font-size:0.95rem;
+    margin:0 0 24px;
+  }
+
+  .board-scroll{
+    overflow-x:auto;
+    padding-bottom:4px;
+  }
+
+  .board{
+    background:var(--bg);
+    border:3px solid var(--board-border);
+    border-radius:14px;
+    box-shadow:0 0 0 1px #000, 0 0 28px var(--board-border-glow);
+    padding:10px;
+    min-width:760px;
+  }
+
+  .grid{
+    display:grid;
+    grid-template-columns: 1.15fr repeat(5, 1fr);
+    gap:var(--gap);
+  }
+
+  .cat-label{
+    background:var(--bg);
+    color:var(--label-text);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    font-family:var(--font-display);
+    font-weight:700;
+    font-size:clamp(0.78rem, 1.5vw, 1.05rem);
+    line-height:1.25;
+    padding:10px 8px;
+    min-height:96px;
+  }
+
+  .cell{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-family:var(--font-display);
+    font-weight:800;
+    font-size:clamp(1.4rem, 3vw, 2.1rem);
+    color:var(--cell-text);
+    border-radius:6px;
+    min-height:96px;
+    cursor:pointer;
+    border:none;
+    transition:transform 0.12s ease, filter 0.12s ease;
+    user-select:none;
+  }
+  .cell:hover:not(.opened){ transform:scale(1.035); filter:brightness(1.06); }
+  .cell:active:not(.opened){ transform:scale(0.98); }
+  .cell:focus-visible{ outline:3px solid #fff; outline-offset:-3px; }
+
+  .col-0{ background:linear-gradient(160deg, var(--col1-a), var(--col1-b)); }
+  .col-1{ background:linear-gradient(160deg, var(--col2-a), var(--col2-b)); }
+  .col-2{ background:linear-gradient(160deg, var(--col3-a), var(--col3-b)); }
+  .col-3{ background:linear-gradient(160deg, var(--col4-a), var(--col4-b)); }
+  .col-4{ background:linear-gradient(160deg, var(--col5-a), var(--col5-b)); }
+
+  .cell.opened{
+    background:#161616 !important;
+    color:#4a4a4a;
+    cursor:default;
+    box-shadow:inset 0 0 0 2px #2a2a2a;
+  }
+  .cell.opened::after{
+    content:"✓";
+    position:absolute;
+  }
+  .cell.opened .points{ opacity:0.5; }
+  .cell{ position:relative; }
+  .cell .checkmark{
+    display:none;
+    font-size:1.6rem;
+    color:#3fae6a;
+  }
+  .cell.opened .points{ display:none; }
+  .cell.opened .checkmark{ display:block; }
+
+  .legend{
+    margin-top:16px;
+    text-align:center;
+    font-size:0.85rem;
+    color:#8a8296;
+  }
+
+  /* Modal */
+  .modal-overlay{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,0.72);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+    z-index:50;
+    opacity:0;
+    pointer-events:none;
+    transition:opacity 0.18s ease;
+  }
+  .modal-overlay.show{ opacity:1; pointer-events:auto; }
+
+  .modal-card{
+    background:var(--modal-bg);
+    border:2px solid var(--modal-border);
+    border-radius:16px;
+    max-width:640px;
+    width:100%;
+    padding:32px 28px 26px;
+    box-shadow:0 20px 60px rgba(0,0,0,0.6);
+    transform:translateY(10px) scale(0.98);
+    transition:transform 0.18s ease;
+  }
+  .modal-overlay.show .modal-card{ transform:translateY(0) scale(1); }
+
+  .modal-cat{
+    font-family:var(--font-display);
+    font-weight:700;
+    color:#c9b8ff;
+    font-size:0.95rem;
+    text-align:center;
+    margin-bottom:6px;
+  }
+  .modal-points{
+    text-align:center;
+    font-family:var(--font-display);
+    font-weight:800;
+    font-size:1.9rem;
+    color:#fff;
+    margin-bottom:18px;
+  }
+  .modal-question{
+    font-size:1.25rem;
+    line-height:1.5;
+    text-align:center;
+    color:#fff;
+    margin-bottom:22px;
+    font-weight:600;
+  }
+  .modal-answer{
+    display:none;
+    background:var(--answer-bg);
+    border:1px solid var(--answer-border);
+    border-radius:10px;
+    padding:16px 18px;
+    margin-bottom:20px;
+    font-size:1.08rem;
+    line-height:1.5;
+    color:#d9ffe6;
+  }
+  .modal-answer.show{ display:block; }
+  .modal-answer-label{
+    font-weight:800;
+    color:#7be7a2;
+    margin-bottom:4px;
+    display:block;
+    font-size:0.9rem;
+  }
+
+  .modal-actions{
+    display:flex;
+    gap:10px;
+    justify-content:center;
+    flex-wrap:wrap;
+  }
+  button.action-btn{
+    font-family:var(--font-body);
+    font-weight:800;
+    font-size:0.95rem;
+    padding:11px 22px;
+    border-radius:10px;
+    border:none;
+    cursor:pointer;
+    transition:filter 0.12s ease, transform 0.12s ease;
+  }
+  button.action-btn:hover{ filter:brightness(1.1); }
+  button.action-btn:active{ transform:scale(0.97); }
+  .btn-reveal{ background:#7c5cff; color:#fff; }
+  .btn-close{ background:#2a2a2a; color:#eee; }
+
+  @media (max-width: 640px){
+    .cat-label{ font-size:0.72rem; min-height:78px; }
+    .cell{ min-height:78px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1 class="title">Сира Жеопарди</h1>
+  <p class="subtitle">Ұяшықты таңда — сұрақ шығады, содан кейін жауабын аш</p>
+
+  <div class="board-scroll">
+    <div class="board">
+      <div class="grid" id="grid"></div>
+    </div>
+  </div>
+
+  <p class="legend">Ашылған ұяшық сұр түске боялып, ✓ белгісімен қалады</p>
+</div>
+
+<div class="modal-overlay" id="overlay">
+  <div class="modal-card">
+    <div class="modal-cat" id="modalCat"></div>
+    <div class="modal-points" id="modalPoints"></div>
+    <div class="modal-question" id="modalQuestion"></div>
+    <div class="modal-answer" id="modalAnswer">
+      <span class="modal-answer-label">Жауабы:</span>
+      <span id="modalAnswerText"></span>
+    </div>
+    <div class="modal-actions">
+      <button class="action-btn btn-reveal" id="revealBtn">Жауапты көру</button>
+      <button class="action-btn btn-close" id="closeBtn">Жабу</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const POINTS = [5, 10, 15, 20, 25];
+
+const CATEGORIES = [
+  {
+    name: "Пайғамбарлыққа дейінгі өмір",
+    q: [
+      { question: "Мұхаммед пайғамбар (с.ғ.с.) қай оқиғамен аталатын жылы дүниеге келді?", answer: "«Піл жылы» — Мекке Кағбасына шабуыл жасамақ болған Абраха әскері жеңіліске ұшыраған жыл (шамамен 570 ж.)." },
+      { question: "Пайғамбардың әкесінің аты кім еді, және ол бала туылғанға дейін не болды?", answer: "Әкесінің аты — Абдулла; ол Мұхаммед (с.ғ.с.) дүниеге келгенге дейін қайтыс болған." },
+      { question: "Пайғамбарды нәрестелік шағында далада емізіп, тәрбиелеген әйелдің аты кім?", answer: "Халима әл-Саадия — оны шөлдегі Бану Саад тайпасында тәрбиелеген." },
+      { question: "Пайғамбардың алғашқы жұбайы кім болды және ол қандай кәсіппен айналысқан?", answer: "Хадиша бинт Хувайлид — беделді әрі табысты сауда ісімен айналысқан әйел." },
+      { question: "«Хилф әл-Фудул» (Игілік одағы) неліктен және қашан құрылды?", answer: "Ислам келуден бұрын, Меккеде әділетсіздікке ұшыраған, құқығы аяқасты болған адамдарды қорғау мақсатында құрылған ерікті одақ; жас Мұхаммед (с.ғ.с.) те қатысқан." }
+    ]
+  },
+  {
+    name: "Уахи түсуі және алғашқы Мекке кезеңі",
+    q: [
+      { question: "Пайғамбарға алғашқы уахи қай жерде түсті?", answer: "Мекке маңындағы Хира тауының үңгірінде." },
+      { question: "Пайғамбарға түскен алғашқы аяттар қай сүреден болды?", answer: "«Аляк» сүресінің алғашқы аяттары («Оқы!» деген бұйрықпен басталады)." },
+      { question: "Исламды алғаш қабылдағандардың қатарында кімдер болды?", answer: "Хадиша (әйелдерден), Әбу Бәкір (ер адамдардан), Әли (жасөспірімдерден) және Зайд ибн Хариса." },
+      { question: "Мекке тайпалары мұсылмандарды қолдаған Бану Хашим руына қарсы қандай шара қолданды?", answer: "Оларға сауда-саттық пен некелесуге тыйым салынған үш жылдық бойкот (қоршау) жариялады." },
+      { question: "«Ам әл-Хузн» — «Қайғы жылы» деп аталатын жыл неліктен осылай аталған?", answer: "Сол жылы Пайғамбардың жұбайы Хадиша мен қамқоршысы, ағасы Әбу Талиб қайтыс болған." }
+    ]
+  },
+  {
+    name: "Хижра және Мәдина мемлекетінің құрылуы",
+    q: [
+      { question: "Пайғамбар мен мұсылмандар Меккеден қай қалаға көшті?", answer: "Ясрибке, кейін ол Мәдина ән-Набия («Пайғамбар қаласы») деп аталды." },
+      { question: "Хижраға дейін болған, Пайғамбарды бір түнде Меккеден Иерусалимге, содан кейін аспанға көтерілуін баяндайтын оқиға қалай аталады?", answer: "Исра мен Мигъраж (Түнгі сапар және Көкке көтерілу)." },
+      { question: "Мәдинаға көшкен мұсылмандар (мұхажирлер) мен жергілікті мұсылмандар (ансарлар) арасында Пайғамбар не орнатты?", answer: "Муахат — бауырластық шарты, оған сай ансарлар мұхажирлермен мал-мүлкін бөлісті." },
+      { question: "Мәдинадағы мұсылмандар, яһудилер және басқа топтардың құқық-міндеттерін реттеген құжат қалай аталады?", answer: "Мәдина сахифасы (Мәдина конституциясы)." },
+      { question: "Пайғамбар Мәдинаға келгеннен кейін алдымен нені салдырды?", answer: "Мешітті — Мәсжид ән-Набауи (Пайғамбар мешіті)." }
+    ]
+  },
+  {
+    name: "Соғыстар мен келісімдер",
+    q: [
+      { question: "Мұсылмандардың саны жағынан әлдеқайда басым Мекке әскерін жеңген алғашқы үлкен шайқасы қалай аталады?", answer: "Бадр шайқасы (624 ж.)." },
+      { question: "Пайғамбар жарақат алған, мұсылмандар алғашқыда басым болса да, тәртіп бұзу салдарынан жеңіліске ұшыраған шайқас қайсы?", answer: "Ухуд шайқасы (625 ж.)." },
+      { question: "Мәдинаны қоршаудан қорғау үшін қаланың айналасына ор қазу тәсілі қолданылған соғыс қалай аталады?", answer: "Хандақ шайқасы (Ор соғысы, 627 ж.)." },
+      { question: "628 жылы мұсылмандар мен құрайыштар арасында жасалған, шарттары алғашында мұсылмандарға тиімсіз көрінгенімен кейін үлкен пайда әкелген келісім қалай аталады?", answer: "Худайбия келісімі." },
+      { question: "Худайбиядан кейін мұсылмандар жаулап алған, яһуди тайпалары мекендеген қорғанды оазис қалай аталады?", answer: "Хайбар (Хайбар шайқасы, 628 ж.)." }
+    ]
+  },
+  {
+    name: "Мекке жаулап алынуы және соңғы жылдар",
+    q: [
+      { question: "Мекке қай жылы, қандай жолмен (қансыз ба, соғыспен бе) жаулап алынды?", answer: "630 жылы, іс жүзінде қансыз, Мекке тұрғындары қарсылықсыз бағынды." },
+      { question: "Мекке жаулап алынғаннан кейін Қағба ішінен не жойылды?", answer: "Қағба ішіндегі және айналасындағы пұттар (бұрыштар) құртылды." },
+      { question: "Хунайн шайқасы қай тайпаға қарсы болды?", answer: "Хауазин тайпасына қарсы (630 ж., Мекке жаулап алынғаннан кейін көп ұзамай)." },
+      { question: "Пайғамбардың соңғы қажылығы қалай аталады және неліктен маңызды саналады?", answer: "Хаджату әл-Уада (Қоштасу қажылығы) — онда Пайғамбар өзінің соңғы, аса маңызды уағызын («Қоштасу уағызы») айтты." },
+      { question: "Пайғамбар қай жылы қайтыс болды?", answer: "632 жылы, Мәдинада, 63 жасында." }
+    ]
+  }
+];
+
+const grid = document.getElementById('grid');
+
+CATEGORIES.forEach((cat, catIdx) => {
+  const label = document.createElement('div');
+  label.className = 'cat-label';
+  label.textContent = cat.name;
+  grid.appendChild(label);
+
+  POINTS.forEach((pt, colIdx) => {
+    const cell = document.createElement('button');
+    cell.className = `cell col-${colIdx}`;
+    cell.setAttribute('data-cat', catIdx);
+    cell.setAttribute('data-col', colIdx);
+    cell.innerHTML = `<span class="points">${pt}</span><span class="checkmark">✓</span>`;
+    cell.addEventListener('click', () => openCell(catIdx, colIdx, cell));
+    grid.appendChild(cell);
+  });
+});
+
+const overlay = document.getElementById('overlay');
+const modalCat = document.getElementById('modalCat');
+const modalPoints = document.getElementById('modalPoints');
+const modalQuestion = document.getElementById('modalQuestion');
+const modalAnswer = document.getElementById('modalAnswer');
+const modalAnswerText = document.getElementById('modalAnswerText');
+const revealBtn = document.getElementById('revealBtn');
+const closeBtn = document.getElementById('closeBtn');
+
+let activeCell = null;
+
+function openCell(catIdx, colIdx, cellEl){
+  if (cellEl.classList.contains('opened')) return;
+  activeCell = cellEl;
+  const cat = CATEGORIES[catIdx];
+  const item = cat.q[colIdx];
+  modalCat.textContent = cat.name;
+  modalPoints.textContent = POINTS[colIdx] + ' ұпай';
+  modalQuestion.textContent = item.question;
+  modalAnswerText.textContent = item.answer;
+  modalAnswer.classList.remove('show');
+  revealBtn.style.display = 'inline-block';
+  overlay.classList.add('show');
+}
+
+revealBtn.addEventListener('click', () => {
+  modalAnswer.classList.add('show');
+  revealBtn.style.display = 'none';
+});
+
+function closeModal(){
+  overlay.classList.remove('show');
+  if (activeCell){
+    activeCell.classList.add('opened');
+    activeCell = null;
+  }
+}
+
+closeBtn.addEventListener('click', closeModal);
+overlay.addEventListener('click', (e) => {
+  if (e.target === overlay) closeModal();
+});
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && overlay.classList.contains('show')) closeModal();
+});
+</script>
+</body>
+</html>
