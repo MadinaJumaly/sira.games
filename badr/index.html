@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Бәдір шайқасы – 46-дәріс сұрақтары</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=PT+Sans:wght@400;700&family=PT+Serif:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --sand: #EADBBE;
+    --sand-deep: #D9C49B;
+    --well: #1E5A5E;
+    --well-dark: #143E41;
+    --gold: #C8942A;
+    --date: #5A3927;
+    --ink: #221C16;
+    --used: #B9A887;
+    --serif: "PT Serif", Georgia, serif;
+    --sans: "PT Sans", "Segoe UI", Arial, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--sand);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 17px;
+    line-height: 1.5;
+  }
+  a { color: var(--well); }
+  :focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
+
+  header {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px 20px 8px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 8px 24px;
+  }
+  .home { font-size: 15px; text-decoration: none; border-bottom: 1px solid currentColor; }
+  h1 {
+    font-family: var(--serif);
+    font-size: clamp(30px, 5vw, 52px);
+    line-height: 1.05;
+    margin: 0;
+    color: var(--date);
+  }
+  .sub { margin: 4px 0 0; font-size: 16px; color: var(--date); }
+
+  main { max-width: 1200px; margin: 0 auto; padding: 8px 20px 40px; }
+
+  /* Teams */
+  .teams {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 16px 0 20px;
+    align-items: stretch;
+  }
+  .team {
+    background: #F5ECD9;
+    border: 2px solid var(--sand-deep);
+    border-radius: 6px;
+    padding: 8px 12px;
+    min-width: 150px;
+    flex: 1 1 150px;
+  }
+  .team input {
+    font: 700 16px var(--sans);
+    border: none;
+    background: transparent;
+    width: 100%;
+    color: var(--ink);
+    padding: 0;
+  }
+  .team .score { font: 700 32px var(--serif); color: var(--well); }
+  .team .score.neg { color: #9B2C1F; }
+  .tools { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  button {
+    font: 700 15px var(--sans);
+    border-radius: 4px;
+    border: 2px solid var(--date);
+    background: transparent;
+    color: var(--date);
+    padding: 8px 14px;
+    cursor: pointer;
+  }
+  button:hover { background: var(--date); color: var(--sand); }
+
+  /* Board */
+  .board-wrap { overflow-x: auto; padding-bottom: 6px; }
+  .board {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(120px, 1fr));
+    gap: 6px;
+    min-width: 760px;
+  }
+  .cat {
+    font-family: var(--serif);
+    font-weight: 700;
+    font-size: 16px;
+    line-height: 1.25;
+    color: var(--sand);
+    background: var(--date);
+    padding: 12px 8px;
+    text-align: center;
+    border-radius: 4px 4px 0 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 70px;
+  }
+  .cell {
+    font: 700 clamp(26px, 3.2vw, 40px) var(--serif);
+    color: var(--gold);
+    background: var(--well);
+    border: none;
+    border-radius: 2px;
+    min-height: 86px;
+    transition: background .15s;
+  }
+  .cell:hover { background: var(--well-dark); color: var(--gold); }
+  .cell.used {
+    background: var(--used);
+    color: transparent;
+    cursor: default;
+  }
+  .cell.used:hover { background: var(--used); }
+
+  /* Question dialog */
+  dialog {
+    border: none;
+    border-radius: 8px;
+    padding: 0;
+    width: min(760px, 94vw);
+    background: var(--well);
+    color: #F5ECD9;
+  }
+  dialog::backdrop { background: rgba(34, 28, 22, .7); }
+  .q-head {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 16px 22px 0;
+    font-size: 15px;
+    color: var(--sand-deep);
+  }
+  .q-head strong { color: var(--gold); font: 700 22px var(--serif); }
+  .q-text {
+    font: 400 clamp(21px, 2.8vw, 30px)/1.4 var(--serif);
+    padding: 14px 22px 8px;
+    margin: 0;
+  }
+  .q-answer {
+    margin: 8px 22px 0;
+    padding: 14px 16px;
+    background: var(--sand);
+    color: var(--ink);
+    border-radius: 4px;
+    font-size: 18px;
+    line-height: 1.55;
+  }
+  .q-answer b { color: var(--date); }
+  .q-actions { padding: 18px 22px 22px; display: flex; flex-wrap: wrap; gap: 8px; }
+  dialog button { border-color: var(--sand); color: var(--sand); }
+  dialog button:hover { background: var(--sand); color: var(--well-dark); }
+  dialog button.primary { background: var(--gold); border-color: var(--gold); color: var(--ink); }
+  dialog button.primary:hover { background: #E0AE45; }
+  .award { display: flex; flex-wrap: wrap; gap: 8px; width: 100%; }
+  .award-row { display: flex; gap: 4px; align-items: center; }
+  .award-row span { font-size: 15px; margin-right: 4px; }
+  .award-row button { padding: 6px 10px; }
+  [hidden] { display: none !important; }
+
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <h1>Бәдір шайқасы</h1>
+    <p class="sub">Пайғамбарымыздың (ﷺ) өмірбаяны, 46-дәріс</p>
+  </div>
+  <a class="home" href="/">Басты бетке</a>
+</header>
+
+<main>
+  <section class="teams" id="teams" aria-label="Командалар"></section>
+  <div class="tools">
+    <button id="addTeam">Команда қосу</button>
+    <button id="removeTeam">Команданы алып тастау</button>
+    <button id="reset">Жаңа ойын</button>
+  </div>
+
+  <div class="board-wrap" style="margin-top:20px">
+    <div class="board" id="board"></div>
+  </div>
+</main>
+
+<dialog id="qDialog" aria-labelledby="qText">
+  <div class="q-head"><span id="qCat"></span><strong id="qVal"></strong></div>
+  <p class="q-text" id="qText"></p>
+  <div class="q-answer" id="qAnswer" hidden></div>
+  <div class="q-actions">
+    <button class="primary" id="showAnswer">Жауабын көрсету</button>
+    <div class="award" id="award" hidden></div>
+    <button id="closeQ">Жабу</button>
+  </div>
+</dialog>
+
+<script>
+const CATEGORIES = [
+  {
+    name: "Дұға мен жәрдем",
+    q: [
+      [100, "Пайғамбарымыз (ﷺ) шатырда ұзақ дұға еткенде иығынан не түсіп қалды?",
+            "Шапаны (ридасы). Әбу Бәкір (р.а.) оны қайта жауып: «Раббыңа айтқаның жетеді», – деді."],
+      [200, "Пайғамбарымыздың (ﷺ) Бәдірдегі дұғасының мәні қандай еді?",
+            "«Уа, Алла! Маған берген уәдеңді орында. Егер бүгін осы топ жойылса, жер бетінде Саған құлшылық ететін ешкім қалмайды»."],
+      [300, "Шайқас алдында Әбу Жәһіл қандай дұға жасады?",
+            "«Уа, Алла! Туыстық байланысты үзіп, әке мен баланы ажыратқанды құрт. Қай жақ хақ болса, соған жәрдем бер». Сөйтіп өзіне өзі үкім шығарды."],
+      [400, "Пайғамбарымыз (ﷺ) мүшріктерге бір уыс топырақ шашқанда қандай сөз айтты?",
+            "«Шәһатил-ужуһ», яғни «Беттер бүлінсін!»"]
+    ]
+  },
+  {
+    name: "Періштелер",
+    q: [
+      [100, "Бәдірде мұсылмандарға көмекке кімдер жіберілді?",
+            "Періштелер, бастарында Жәбірейіл (а.с.)."],
+      [200, "Шайқаста «Алға, Хайзум!» деген дауыс естілді. Хайзум деген не?",
+            "Періштенің аты."],
+      [300, "Жәбірейіл (а.с.): «Сахабаларыңның ең абзалы кім?» – деп сұрағанда, Пайғамбарымыз (ﷺ) не деп жауап берді?",
+            "«Бәдірге қатысқандар». Жәбірейіл: «Періштелердің ішінде де ең абзалы Бәдірге қатысқандары», – деді."],
+      [400, "Ібіліс Бәдірге кімнің кейпінде келді және неге қашты?",
+            "Сурақа ибн Мәлік ибн Жұғшум әл-Мудлижидің кейпінде. Періштелерді көргенде: «Мен Алладан қорқамын», – деп қашты."]
+    ]
+  },
+  {
+    name: "Аяттар",
+    q: [
+      [100, "Құранның қай сүресі Бәдір шайқасына байланысты түсті?",
+            "Анфал сүресі."],
+      [200, "Анфал сүресінің 9-аяты бойынша Алла қанша періштемен көмек беретінін уәде етті?",
+            "Бірінен соң бірі тізілген мың періштемен."],
+      [300, "Топырақ шашылған сәт туралы Анфал сүресінің 17-аятында не делінген?",
+            "«Лақтырған кезіңде сен лақтырған жоқсың, Алла лақтырды»."],
+      [400, "Шайтан адамға «Кәпір бол» деп, ол кәпір болған соң «Мен сенен безермін» дейтіні туралы аят қай сүреде?",
+            "Хашр сүресі, 16-аят."]
+    ]
+  },
+  {
+    name: "Шейіттер мен батырлар",
+    q: [
+      [100, "Жәннәттің кеңдігін естіп, «Бах, бах!» деп таңғалған сахаба кім?",
+            "Умайр ибн әл-Хумам әл-Ансари (р.а.)."],
+      [200, "Умайр (р.а.) қолындағы құрмаларды неге лақтырып тастады?",
+            "Құрманы жеп біткенше күту тым ұзақ өмір болады деп ойлады. Соғысқа кіріп, шейіт болды."],
+      [300, "«Алла пендесінің қай ісіне риза болып күледі?» деп сұраған сахаба кім және ол не істеді?",
+            "Ауф ибн әл-Харис (ибн Афра). Жауап: сауытсыз жауға ұмтылу. Ол сауытын шешіп, соғысқа кіріп, шейіт болды."],
+      [400, "Әбдурахман ибн Ауфтан Әбу Жәһілді сұраған жас екі ансар кім?",
+            "Муаз ибн Амр ибн әл-Жамух және Муаууиз ибн Афра."]
+    ]
+  },
+  {
+    name: "Әбу Жәһіл",
+    q: [
+      [100, "Пайғамбарымыз (ﷺ) «бұл үмбеттің перғауыны» деп кімді атады?",
+            "Әбу Жәһілді."],
+      [200, "Әбу Жәһілдің соңғы демінде жанына барған сахаба кім?",
+            "Абдулла ибн Мәсғуд (р.а.)."],
+      [300, "Әбу Жәһіл өлер алдында кімнің қолынан өлгеніне өкінді?",
+            "Мединалық егіншілердің (ансарлардың) қолынан. Абдулла ибн Мәсғудқа: «Биікке шығыпсың ғой, қойшы», – деді."],
+      [400, "Әбу Жәһілдің олжасы (қылышы, сауыты) кімге берілді?",
+            "Муаз ибн Амр ибн әл-Жамухқа."]
+    ]
+  },
+  {
+    name: "Меккеге жеткен хабар",
+    q: [
+      [100, "Зәмзәм жанында Әбу Ләһабтың басынан ағашпен ұрған кім?",
+            "Аббастың әйелі Умму Фадл."],
+      [200, "Періштелер туралы хабарға қуанғаны үшін Әбу Ләһабтан таяқ жеген кім?",
+            "Аббастың құлы Әбу Рафиғ."],
+      [300, "Бәдірдегі жеңілістің хабарын Меккеге кім жеткізді?",
+            "Хайсуман ибн Абдулла әл-Хузағи. Сафуан ибн Умайя алғашында оны есінен адасқан деп ойлады."],
+      [400, "Әбу Ләһаб қалай өлді?",
+            "Бәдірден шамамен жеті күн өткен соң жұқпалы жарадан (әл-ғадәса) өлді. Балалары жақындай алмай, денесін алыстан итеріп, тас лақтырып көмді."]
+    ]
+  }
+];
+
+const STORE_KEY = "sira-badr-46";
+let state = load() || freshState();
+let current = null;
+
+function freshState() {
+  return {
+    teams: [{ name: "1-команда", score: 0 }, { name: "2-команда", score: 0 }],
+    used: []
+  };
+}
+function load() {
+  try { const raw = localStorage.getItem(STORE_KEY); return raw ? JSON.parse(raw) : null; }
+  catch (e) { return null; }
+}
+function save() {
+  try { localStorage.setItem(STORE_KEY, JSON.stringify(state)); } catch (e) {}
+}
+
+function renderTeams() {
+  const box = document.getElementById("teams");
+  box.innerHTML = "";
+  state.teams.forEach((t, i) => {
+    const div = document.createElement("div");
+    div.className = "team";
+    const input = document.createElement("input");
+    input.value = t.name;
+    input.setAttribute("aria-label", "Команда аты");
+    input.addEventListener("input", () => { state.teams[i].name = input.value; save(); });
+    const score = document.createElement("div");
+    score.className = "score" + (t.score < 0 ? " neg" : "");
+    score.textContent = t.score;
+    div.append(input, score);
+    box.append(div);
+  });
+}
+
+function renderBoard() {
+  const board = document.getElementById("board");
+  board.innerHTML = "";
+  CATEGORIES.forEach(c => {
+    const h = document.createElement("div");
+    h.className = "cat";
+    h.textContent = c.name;
+    board.append(h);
+  });
+  for (let row = 0; row < 4; row++) {
+    CATEGORIES.forEach((c, ci) => {
+      const id = ci + "-" + row;
+      const btn = document.createElement("button");
+      btn.className = "cell";
+      btn.textContent = c.q[row][0];
+      if (state.used.includes(id)) {
+        btn.classList.add("used");
+        btn.disabled = true;
+        btn.setAttribute("aria-label", "Ашылған сұрақ");
+      } else {
+        btn.setAttribute("aria-label", c.name + ", " + c.q[row][0] + " ұпай");
+        btn.addEventListener("click", () => openQuestion(ci, row));
+      }
+      board.append(btn);
+    });
+  }
+}
+
+function openQuestion(ci, row) {
+  const [val, text, answer] = CATEGORIES[ci].q[row];
+  current = { id: ci + "-" + row, val };
+  document.getElementById("qCat").textContent = CATEGORIES[ci].name;
+  document.getElementById("qVal").textContent = val;
+  document.getElementById("qText").textContent = text;
+  const ans = document.getElementById("qAnswer");
+  ans.innerHTML = "<b>Жауабы:</b> ";
+  ans.append(document.createTextNode(answer));
+  ans.hidden = true;
+  document.getElementById("showAnswer").hidden = false;
+
+  const award = document.getElementById("award");
+  award.innerHTML = "";
+  award.hidden = true;
+  state.teams.forEach((t, i) => {
+    const r = document.createElement("div");
+    r.className = "award-row";
+    const label = document.createElement("span");
+    label.textContent = t.name;
+    const plus = document.createElement("button");
+    plus.textContent = "+" + val;
+    plus.addEventListener("click", () => { changeScore(i, val); finish(); });
+    const minus = document.createElement("button");
+    minus.textContent = "−" + val;
+    minus.addEventListener("click", () => changeScore(i, -val));
+    r.append(label, plus, minus);
+    award.append(r);
+  });
+  document.getElementById("qDialog").showModal();
+}
+
+function changeScore(i, delta) {
+  state.teams[i].score += delta;
+  save();
+  renderTeams();
+}
+
+function finish() {
+  if (current && !state.used.includes(current.id)) state.used.push(current.id);
+  save();
+  current = null;
+  document.getElementById("qDialog").close();
+  renderBoard();
+}
+
+document.getElementById("showAnswer").addEventListener("click", e => {
+  document.getElementById("qAnswer").hidden = false;
+  document.getElementById("award").hidden = false;
+  e.target.hidden = true;
+});
+document.getElementById("closeQ").addEventListener("click", () => {
+  const answered = !document.getElementById("qAnswer").hidden;
+  if (answered) finish(); else { current = null; document.getElementById("qDialog").close(); }
+});
+document.getElementById("qDialog").addEventListener("cancel", () => { current = null; });
+
+document.getElementById("addTeam").addEventListener("click", () => {
+  if (state.teams.length >= 6) return;
+  state.teams.push({ name: (state.teams.length + 1) + "-команда", score: 0 });
+  save(); renderTeams();
+});
+document.getElementById("removeTeam").addEventListener("click", () => {
+  if (state.teams.length <= 1) return;
+  state.teams.pop();
+  save(); renderTeams();
+});
+document.getElementById("reset").addEventListener("click", () => {
+  if (!confirm("Ұпайлар мен ашылған сұрақтар тазаланады. Жаңа ойын бастаймыз ба?")) return;
+  const names = state.teams.map(t => t.name);
+  state = freshState();
+  state.teams = names.map(n => ({ name: n, score: 0 }));
+  save(); renderTeams(); renderBoard();
+});
+
+renderTeams();
+renderBoard();
+</script>
+</body>
+</html>
