@@ -1,403 +1,652 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="kk">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Сира Викторинасы</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>«Үздік Ұстаз» — Білім сайысы 2026</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Manrope:wght@400;600;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Montserrat:wght@800;900&family=Noto+Sans:wght@400;500;600&family=Noto+Serif+Display:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
-  :root{
-    --bg:#0a0a0a;
-    --board-border:#7c5cff;
-    --board-border-glow:#7c5cff88;
-    --label-text:#f5f5f5;
-    --col1-a:#8CF2B8; --col1-b:#5FE3A0;
-    --col2-a:#E7F27A; --col2-b:#D6E84A;
-    --col3-a:#F6C64B; --col3-b:#F0A93A;
-    --col4-a:#F58A3D; --col4-b:#EE6A2A;
-    --col5-a:#E5493C; --col5-b:#C22E27;
-    --cell-text:#1a1207;
-    --gap:6px;
-    --modal-bg:#141018;
-    --modal-border:#7c5cff;
-    --answer-bg:#233d2b;
-    --answer-border:#3fae6a;
-    --font-display:'Baloo 2', 'Manrope', system-ui, sans-serif;
-    --font-body:'Manrope', system-ui, sans-serif;
-  }
-  :root:not([data-theme="light"]){ --bg:#0a0a0a; }
-  :root[data-theme="dark"]{ --bg:#0a0a0a; }
+/* ---------- Palette: marble, lapis, dome turquoise, gold, ink ---------- */
+:root{
+  --marble:#F2F4F2;
+  --lapis:#0E3A44;
+  --dome:#2C8C92;
+  --gold:#C6A052;
+  --ink:#142A30;
+  --cream:#FAF3E3;
+  --navy:#14213D;
 
-  *{ box-sizing:border-box; }
-  html,body{
-    margin:0; padding:0;
-    background:var(--bg);
-    color:var(--label-text);
-    font-family:var(--font-body);
-    min-height:100%;
-  }
+  --bg:var(--cream);
+  --surface:#FFFFFF;
+  --fg:var(--navy);
+  --muted:#4E6469;
+  --line:rgba(198,160,82,.55);
+  --cell:var(--lapis);
+  --cell-hover:#134A56;
+  --gold-text:var(--navy);
 
-  .wrap{
-    max-width:1200px;
-    margin:0 auto;
-    padding:28px 16px 48px;
-  }
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  color-scheme:light;
+}
+*,*::before,*::after{box-sizing:border-box}
+*{margin:0}
+html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px);background:var(--bg)}
+body{
+  height:100%;display:flex;flex-direction:column;overflow:hidden;
+  background:var(--bg);color:var(--fg);
+  font-family:"Noto Sans",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  font-size:clamp(15px,1.15vw + .5vh,20px);line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3{font-family:"Montserrat",Arial,sans-serif;font-weight:800;line-height:1.12;letter-spacing:-.01em}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:3px solid var(--gold);outline-offset:3px}
+.ar{font-family:"Amiri","Noto Naskh Arabic","Traditional Arabic",serif;direction:rtl}
 
-  .title{
-    text-align:center;
-    font-family:var(--font-display);
-    font-weight:800;
-    font-size:clamp(1.6rem, 4vw, 2.6rem);
-    letter-spacing:0.5px;
-    margin:0 0 4px;
-    color:#fff;
-  }
-  .subtitle{
-    text-align:center;
-    color:#a99fc9;
-    font-size:0.95rem;
-    margin:0 0 24px;
-  }
+/* ---------- Deck ---------- */
+.deck{position:relative;flex:1;overflow:hidden;min-height:0}
+.deck::before{
+  content:"";position:absolute;inset:0;pointer-events:none;opacity:.04;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='88' height='88' viewBox='0 0 88 88'%3E%3Cg fill='none' stroke='%23C6A052' stroke-width='1'%3E%3Crect x='24' y='24' width='40' height='40'/%3E%3Crect x='24' y='24' width='40' height='40' transform='rotate(45 44 44)'/%3E%3Ccircle cx='44' cy='44' r='7'/%3E%3Cpath d='M0 0L16 16M88 0L72 16M0 88L16 72M88 88L72 72'/%3E%3C/g%3E%3C/svg%3E");
+  background-size:88px;
+  -webkit-mask-image:radial-gradient(ellipse at center,transparent 35%,#000 95%);
+          mask-image:radial-gradient(ellipse at center,transparent 35%,#000 95%);
+}
+.slide{
+  position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;display:flex;
+  padding:clamp(18px,4vh,52px) clamp(18px,5vw,80px);
+  opacity:0;visibility:hidden;transform:translateX(24px);
+  transition:opacity .45s ease,transform .45s ease,visibility 0s linear .45s;
+}
+.slide.before{transform:translateX(-24px)}
+.slide.active{opacity:1;visibility:visible;transform:none;transition:opacity .45s ease,transform .45s ease,visibility 0s}
+.inner{margin:auto;width:100%;max-width:1200px}
 
-  .board-scroll{
-    overflow-x:auto;
-    padding-bottom:4px;
-  }
+/* Feature slides (title, closing): light cream with dark navy text */
+.slide.feature{
+  color:var(--navy);
+  background:
+    radial-gradient(ellipse at 50% 45%,#FFFDF6 0%,#FAF3E3 55%,#F3E7CB 100%);
+}
+.slide.feature::before{
+  content:"";position:absolute;inset:0;pointer-events:none;opacity:.03;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='88' height='88' viewBox='0 0 88 88'%3E%3Cg fill='none' stroke='%23C6A052' stroke-width='1'%3E%3Crect x='24' y='24' width='40' height='40'/%3E%3Crect x='24' y='24' width='40' height='40' transform='rotate(45 44 44)'/%3E%3Ccircle cx='44' cy='44' r='7'/%3E%3Cpath d='M0 0L16 16M88 0L72 16M0 88L16 72M88 88L72 72'/%3E%3C/g%3E%3C/svg%3E");
+  background-size:88px;
+}
 
-  .board{
-    background:var(--bg);
-    border:3px solid var(--board-border);
-    border-radius:14px;
-    box-shadow:0 0 0 1px #000, 0 0 28px var(--board-border-glow);
-    padding:10px;
-    min-width:760px;
-  }
+/* ---------- Mihrab arch (title + closing) ---------- */
+.mihrab{
+  position:relative;margin:auto;text-align:center;
+  width:min(860px,94vw);
+  padding:clamp(70px,16vh,170px) clamp(20px,5vw,64px) clamp(28px,6vh,64px);
+}
+.mihrab::before,.mihrab::after{
+  content:"";position:absolute;inset:0;border:1.5px solid var(--gold);border-bottom:0;
+  border-radius:999px 999px 0 0;pointer-events:none;
+}
+.mihrab::after{inset:14px 14px 0;opacity:.45}
+.mihrab .base{position:absolute;left:-6%;right:-6%;bottom:0;height:1.5px;background:linear-gradient(90deg,transparent,var(--gold) 15%,var(--gold) 85%,transparent)}
+.bismillah{font-size:clamp(44px,5.2vw + 2vh,80px);color:var(--navy);line-height:1.5;margin-bottom:clamp(10px,2.5vh,28px)}
+.kicker{font-size:clamp(34px,2.8vw + 1.6vh,56px);color:var(--navy);letter-spacing:.02em;font-weight:600}
+.title-main{
+  font-family:"Montserrat",Arial,sans-serif;
+  font-weight:900;
+  font-size:clamp(38px,5.6vw + 1.5vh,112px);white-space:nowrap;
+  color:var(--navy);
+}
+.title-main .q{color:var(--navy);font-weight:900}
+.star-rule{display:flex;align-items:center;gap:14px;justify-content:center;margin:0 auto clamp(12px,2vh,22px);max-width:340px}
+.star-rule::before,.star-rule::after{content:"";flex:1;height:1px;background:var(--gold);opacity:.7}
+.star-rule svg{width:22px;height:22px;flex:none}
+.year{font-family:"Noto Serif Display",Georgia,serif;font-size:clamp(44px,4vw + 2vh,72px);color:var(--navy)}
 
-  .grid{
-    display:grid;
-    grid-template-columns: 1.15fr repeat(5, 1fr);
-    gap:var(--gap);
-  }
+/* ---------- Common heads ---------- */
+.head{display:flex;align-items:center;gap:clamp(14px,2vw,26px);margin-bottom:clamp(18px,4vh,44px)}
+.badge{position:relative;flex:none;width:clamp(58px,6vw,84px);aspect-ratio:1;display:grid;place-items:center}
+.badge svg{position:absolute;inset:0;width:100%;height:100%}
+.badge span{position:relative;font-family:"Noto Serif Display",Georgia,serif;font-weight:600;font-size:clamp(20px,2vw,30px);color:var(--gold)}
+.head .sub{color:#1e293b;font-weight:bold;font-size:clamp(15px,1.1vw + .5vh,21px)}
+.head h2{font-size:clamp(30px,3.4vw + 1vh,60px);color:var(--fg)}
+.head h2 .q{color:var(--gold-text);font-weight:500}
+.r1-head{flex-direction:column;text-align:center;margin-bottom:0}
 
-  .cat-label{
-    background:var(--bg);
-    color:var(--label-text);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    text-align:center;
-    font-family:var(--font-display);
-    font-weight:700;
-    font-size:clamp(0.78rem, 1.5vw, 1.05rem);
-    line-height:1.25;
-    padding:10px 8px;
-    min-height:96px;
-  }
+/* ---------- Overview ---------- */
+.rounds{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(14px,2vw,28px);list-style:none;padding:0}
+.round-card{
+  position:relative;display:flex;flex-direction:column;text-align:left;width:100%;height:100%;
+  background:var(--surface);border:2px solid #cbd5e1;
+  border-radius:clamp(90px,10vw,150px) clamp(90px,10vw,150px) 10px 10px;
+  padding:clamp(56px,9vh,96px) clamp(18px,2vw,30px) clamp(20px,3vh,32px);
+  transition:transform .25s ease,border-color .25s ease;
+}
+.round-card:hover{transform:translateY(-4px);border-color:var(--gold)}
+.round-card .badge{position:absolute;top:clamp(-30px,-3vw,-22px);left:50%;transform:translateX(-50%);background:var(--bg);border-radius:50%}
+.round-card h3{font-size:clamp(22px,1.9vw + .6vh,34px);margin-bottom:.35em;text-align:center;font-weight:bold;color:#1e293b}
+.round-card .what{color:#1e293b;font-weight:bold;text-align:center;margin-bottom:.8em}
 
-  .cell{
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-family:var(--font-display);
-    font-weight:800;
-    font-size:clamp(1.4rem, 3vw, 2.1rem);
-    color:var(--cell-text);
-    border-radius:6px;
-    min-height:96px;
-    cursor:pointer;
-    border:none;
-    transition:transform 0.12s ease, filter 0.12s ease;
-    user-select:none;
-  }
-  .cell:hover:not(.opened){ transform:scale(1.035); filter:brightness(1.06); }
-  .cell:active:not(.opened){ transform:scale(0.98); }
-  .cell:focus-visible{ outline:3px solid #fff; outline-offset:-3px; }
+.chip{border:1px solid var(--line);background:transparent;border-radius:999px;padding:6px 14px;font-size:.88em}
+.chip[aria-pressed="true"]{background:var(--dome);border-color:var(--dome);color:#fff}
+.btn{border:0;border-radius:999px;padding:10px 22px;font-weight:600}
+.btn.primary{background:var(--lapis);color:var(--marble)}
+.btn.ghost{background:transparent;border:1px solid var(--line)}
 
-  .col-0{ background:linear-gradient(160deg, var(--col1-a), var(--col1-b)); }
-  .col-1{ background:linear-gradient(160deg, var(--col2-a), var(--col2-b)); }
-  .col-2{ background:linear-gradient(160deg, var(--col3-a), var(--col3-b)); }
-  .col-3{ background:linear-gradient(160deg, var(--col4-a), var(--col4-b)); }
-  .col-4{ background:linear-gradient(160deg, var(--col5-a), var(--col5-b)); }
+/* ---------- Round 2: board ---------- */
+.board-slide .head{margin-bottom:clamp(12px,2.4vh,26px)}
+.board{display:grid;grid-template-columns:repeat(5,1fr);gap:clamp(8px,1vw,14px)}
+.cell{
+  position:relative;border:1px solid rgba(198,160,82,.45);background:var(--cell);color:#FFFFFF;
+  border-radius:10px;height:clamp(52px,9.2vh,104px);
+  font-family:"Arial Black","Montserrat",Arial,sans-serif;font-weight:900;font-size:clamp(24px,2.4vw + 1vh,46px);
+  transition:background .2s,transform .2s,opacity .3s;
+}
+.cell:hover{background:var(--cell-hover);transform:translateY(-2px)}
+.cell.used{opacity:.22;transform:none}
+.board-foot,.cases-foot{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:clamp(12px,2.4vh,22px);color:var(--muted);font-size:.88em;flex-wrap:wrap}
 
-  .cell.opened{
-    background:#161616 !important;
-    color:#4a4a4a;
-    cursor:default;
-    box-shadow:inset 0 0 0 2px #2a2a2a;
-  }
-  .cell.opened::after{
-    content:"✓";
-    position:absolute;
-  }
-  .cell.opened .points{ opacity:0.5; }
-  .cell{ position:relative; }
-  .cell .checkmark{
-    display:none;
-    font-size:1.6rem;
-    color:#3fae6a;
-  }
-  .cell.opened .points{ display:none; }
-  .cell.opened .checkmark{ display:block; }
+/* ---------- Round 3: situation cells ---------- */
+.cases{display:grid;grid-template-columns:repeat(5,1fr);gap:clamp(10px,1.4vw,20px)}
+.case{
+  position:relative;aspect-ratio:1.15;border:1px solid rgba(198,160,82,.45);background:var(--cell);color:var(--marble);
+  border-radius:999px 999px 10px 10px;display:grid;place-items:center;padding-top:10%;
+  transition:background .2s,transform .2s,opacity .3s;
+}
+.case:hover{background:var(--cell-hover);transform:translateY(-3px)}
+.case svg{position:absolute;top:14%;width:26%;opacity:.8}
+.case .n{font-family:"Arial Black","Montserrat",Arial,sans-serif;font-size:clamp(34px,3.6vw + 1vh,64px);font-weight:900;color:#FFFFFF;margin-top:12%}
+.case .t{position:absolute;bottom:10%;font-size:clamp(18px,1.2vw + .6vh,24px);font-weight:700;color:#FFFFFF}
+.case.used{opacity:.25;transform:none}
 
-  .legend{
-    margin-top:16px;
-    text-align:center;
-    font-size:0.85rem;
-    color:#8a8296;
-  }
+/* ---------- Closing ---------- */
+.thanks{font-size:clamp(40px,5.6vw + 1.5vh,100px);margin:.1em 0 .35em;color:var(--navy)}
+.closing-ar{font-size:clamp(28px,3vw + 1vh,52px);color:var(--navy);line-height:1.5}
+.closing-tr{color:var(--navy);margin-bottom:clamp(16px,3vh,30px)}
+.closing-note{color:var(--navy);max-width:34em;margin:0 auto;font-size:.95em}
 
-  /* Modal */
-  .modal-overlay{
-    position:fixed;
-    inset:0;
-    background:rgba(0,0,0,0.72);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    padding:20px;
-    z-index:50;
-    opacity:0;
-    pointer-events:none;
-    transition:opacity 0.18s ease;
-  }
-  .modal-overlay.show{ opacity:1; pointer-events:auto; }
+/* ---------- Modal ---------- */
+.modal{position:fixed;inset:0;z-index:50;display:grid;place-items:center;padding:clamp(14px,4vw,48px);background:rgba(6,26,31,.72);opacity:0;visibility:hidden;transition:opacity .25s,visibility 0s linear .25s}
+.modal.open{opacity:1;visibility:visible;transition:opacity .25s}
+.modal-card{
+  width:min(960px,100%);max-height:100%;overflow-y:auto;background:var(--surface);color:var(--fg);
+  border:1px solid var(--gold);border-radius:18px;padding:clamp(22px,4vw,56px);
+  transform:translateY(12px) scale(.98);transition:transform .3s ease;
+}
+.modal.open .modal-card{transform:none}
+.m-meta{display:flex;justify-content:space-between;gap:16px;align-items:baseline;border-bottom:1px solid var(--line);padding-bottom:12px;margin-bottom:clamp(16px,3vh,28px)}
+.m-cat{color:var(--dome);font-weight:600}
+.m-pts{font-family:"Noto Serif Display",Georgia,serif;font-size:1.4em;color:var(--gold-text)}
+.m-q{font-family:"Noto Serif Display",Georgia,serif;font-size:clamp(24px,2.3vw + 1vh,44px);line-height:1.3;font-weight:500}
+.m-answer{margin-top:clamp(18px,3.5vh,34px);padding:clamp(16px,2vw,24px);border-left:4px solid var(--gold);background:rgba(198,160,82,.12);border-radius:0 12px 12px 0}
+.m-answer[hidden]{display:none}
+.m-label{display:block;color:var(--gold-text);font-weight:600;margin-bottom:6px}
+.m-a{font-size:clamp(18px,1.5vw + .7vh,28px);line-height:1.45}
+.cell-qs{list-style:none;padding:0;display:flex;flex-direction:column;gap:clamp(16px,2.6vh,26px)}
+.cell-qs li{padding-bottom:clamp(16px,2.6vh,26px);border-bottom:1px solid var(--line)}
+.cell-qs li:last-child{border-bottom:0;padding-bottom:0}
+.cell-cat{display:block;font-family:"Montserrat",Arial,sans-serif;font-weight:800;font-size:.78em;color:var(--dome);text-transform:uppercase;letter-spacing:.04em;margin-bottom:.4em}
+.cell-q{font-size:clamp(18px,1.4vw + .6vh,26px);line-height:1.35;font-weight:500}
+.cell-a{margin-top:.6em;padding:clamp(10px,1.4vw,16px);border-left:4px solid var(--gold);background:rgba(198,160,82,.12);border-radius:0 10px 10px 0;font-size:.92em}
+.cell-a[hidden]{display:none}
+.m-actions{display:flex;gap:10px;justify-content:space-between;align-items:center;margin-top:clamp(20px,4vh,36px);flex-wrap:wrap}
+.m-actions .hint{color:var(--muted);font-size:.82em}
+.m-actions .btns{display:flex;gap:10px}
 
-  .modal-card{
-    background:var(--modal-bg);
-    border:2px solid var(--modal-border);
-    border-radius:16px;
-    max-width:640px;
-    width:100%;
-    padding:32px 28px 26px;
-    box-shadow:0 20px 60px rgba(0,0,0,0.6);
-    transform:translateY(10px) scale(0.98);
-    transition:transform 0.18s ease;
-  }
-  .modal-overlay.show .modal-card{ transform:translateY(0) scale(1); }
+/* ---------- Bottom bar ---------- */
+.bar{
+  flex:none;display:flex;align-items:center;justify-content:center;gap:clamp(8px,1.4vw,18px);
+  padding:10px clamp(12px,3vw,28px);border-top:1px solid var(--line);background:var(--bg);position:relative;z-index:5;
+}
+.nav-btn{width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:var(--surface);display:grid;place-items:center;font-size:20px;line-height:1}
+.nav-btn:disabled{opacity:.35;cursor:default}
+.dots{display:flex;gap:8px;align-items:center}
+.dot{width:11px;height:11px;padding:0;border:1px solid var(--gold);background:transparent;transform:rotate(45deg);border-radius:2px}
+.dot[aria-current="true"]{background:var(--gold)}
+.count{min-width:3.4em;text-align:center;color:var(--muted);font-variant-numeric:tabular-nums;font-size:.9em}
+.fs{margin-left:clamp(4px,2vw,24px)}
 
-  .modal-cat{
-    font-family:var(--font-display);
-    font-weight:700;
-    color:#c9b8ff;
-    font-size:0.95rem;
-    text-align:center;
-    margin-bottom:6px;
-  }
-  .modal-points{
-    text-align:center;
-    font-family:var(--font-display);
-    font-weight:800;
-    font-size:1.9rem;
-    color:#fff;
-    margin-bottom:18px;
-  }
-  .modal-question{
-    font-size:1.25rem;
-    line-height:1.5;
-    text-align:center;
-    color:#fff;
-    margin-bottom:22px;
-    font-weight:600;
-  }
-  .modal-answer{
-    display:none;
-    background:var(--answer-bg);
-    border:1px solid var(--answer-border);
-    border-radius:10px;
-    padding:16px 18px;
-    margin-bottom:20px;
-    font-size:1.08rem;
-    line-height:1.5;
-    color:#d9ffe6;
-  }
-  .modal-answer.show{ display:block; }
-  .modal-answer-label{
-    font-weight:800;
-    color:#7be7a2;
-    margin-bottom:4px;
-    display:block;
-    font-size:0.9rem;
-  }
-
-  .modal-actions{
-    display:flex;
-    gap:10px;
-    justify-content:center;
-    flex-wrap:wrap;
-  }
-  button.action-btn{
-    font-family:var(--font-body);
-    font-weight:800;
-    font-size:0.95rem;
-    padding:11px 22px;
-    border-radius:10px;
-    border:none;
-    cursor:pointer;
-    transition:filter 0.12s ease, transform 0.12s ease;
-  }
-  button.action-btn:hover{ filter:brightness(1.1); }
-  button.action-btn:active{ transform:scale(0.97); }
-  .btn-reveal{ background:#7c5cff; color:#fff; }
-  .btn-close{ background:#2a2a2a; color:#eee; }
-
-  @media (max-width: 640px){
-    .cat-label{ font-size:0.72rem; min-height:78px; }
-    .cell{ min-height:78px; }
-  }
+/* ---------- Responsive ---------- */
+@media (max-width:860px){
+  .rounds{grid-template-columns:1fr;gap:44px;margin-top:20px}
+  .board{grid-template-columns:repeat(3,1fr)}
+  .cases{grid-template-columns:repeat(3,1fr)}
+  .dots{display:none}
+}
+@media (max-width:520px){
+  .cell{font-size:22px;height:56px}
+  .head{align-items:flex-start}
+}
+@media (prefers-reduced-motion:reduce){
+  *{transition:none!important;animation:none!important}
+}
 </style>
 </head>
 <body>
-<div class="wrap">
-  <h1 class="title">Сира Викторинасы</h1>
-  <p class="subtitle">Ұяшықты таңда — сұрақ шығады, содан кейін жауабын аш</p>
 
-  <div class="board-scroll">
-    <div class="board">
-      <div class="grid" id="grid"></div>
+<!-- Reusable 8-point star -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="star" viewBox="0 0 100 100">
+      <rect x="20" y="20" width="60" height="60" fill="currentColor" stroke="#C6A052" stroke-width="2.5"/>
+      <rect x="20" y="20" width="60" height="60" transform="rotate(45 50 50)" fill="currentColor" stroke="#C6A052" stroke-width="2.5"/>
+      <rect x="23" y="23" width="54" height="54" fill="currentColor"/>
+    </symbol>
+    <symbol id="star-line" viewBox="0 0 100 100">
+      <g fill="none" stroke="#C6A052" stroke-width="5">
+        <rect x="22" y="22" width="56" height="56"/>
+        <rect x="22" y="22" width="56" height="56" transform="rotate(45 50 50)"/>
+      </g>
+    </symbol>
+  </defs>
+</svg>
+
+<main class="deck" id="deck">
+
+  <!-- 1. Title -->
+  <section class="slide feature" aria-label="Титул">
+    <div class="mihrab">
+      <p class="bismillah ar" lang="ar">بِسْمِ اللّٰهِ الرَّحْمٰنِ الرَّحِيمِ</p>
+      <p class="kicker">Білім сайысы</p>
+      <h1 class="title-main"><span class="q">«</span>Үздік Ұстаз<span class="q">»</span></h1>
+      <div class="star-rule"><svg aria-hidden="true"><use href="#star-line"/></svg></div>
+      <p class="year">2026 ж.</p>
+      <span class="base"></span>
     </div>
-  </div>
+  </section>
 
-  <p class="legend">Ашылған ұяшық сұр түске боялып, ✓ белгісімен қалады</p>
-</div>
-
-<div class="modal-overlay" id="overlay">
-  <div class="modal-card">
-    <div class="modal-cat" id="modalCat"></div>
-    <div class="modal-points" id="modalPoints"></div>
-    <div class="modal-question" id="modalQuestion"></div>
-    <div class="modal-answer" id="modalAnswer">
-      <span class="modal-answer-label">Жауабы:</span>
-      <span id="modalAnswerText"></span>
+  <!-- 2. Overview -->
+  <section class="slide overview" aria-label="Сайыс кезеңдері">
+    <div class="inner">
+      <ol class="rounds">
+        <li><button class="round-card" data-go="2">
+          <span class="badge"><svg style="color:var(--lapis)"><use href="#star"/></svg><span>I</span></span>
+          <h3>«Ұстаз — ұлағатты тұлға»</h3>
+          <div class="what">Қатысушылармен танысу</div>
+        </button></li>
+        <li><button class="round-card" data-go="3">
+          <span class="badge"><svg style="color:var(--lapis)"><use href="#star"/></svg><span>II</span></span>
+          <h3>«Білім бәйгесі»</h3>
+          <div class="what">Дін мен дәстүр, фиқһ, қазақстан тарихы</div>
+        </button></li>
+        <li><button class="round-card" data-go="4">
+          <span class="badge"><svg style="color:var(--lapis)"><use href="#star"/></svg><span>III</span></span>
+          <h3>«Парасат алаңы»</h3>
+          <div class="what">Жағдаяттарды шешу</div>
+        </button></li>
+      </ol>
     </div>
-    <div class="modal-actions">
-      <button class="action-btn btn-reveal" id="revealBtn">Жауапты көру</button>
-      <button class="action-btn btn-close" id="closeBtn">Жабу</button>
+  </section>
+
+  <!-- 3. Round 1 -->
+  <section class="slide" aria-label="I кезең">
+    <div class="inner">
+      <div class="head r1-head">
+        <span class="badge"><svg style="color:var(--lapis)"><use href="#star"/></svg><span>I</span></span>
+        <div>
+          <h2><span class="q">«</span>Ұстаз — ұлағатты тұлға<span class="q">»</span></h2>
+          <p class="sub">Қатысушылармен танысу</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. Round 2 -->
+  <section class="slide board-slide" aria-label="II кезең">
+    <div class="inner">
+      <div class="head">
+        <span class="badge"><svg style="color:var(--lapis)"><use href="#star"/></svg><span>II</span></span>
+        <div>
+          <h2><span class="q">«</span>Білім бәйгесі<span class="q">»</span></h2>
+          <p class="sub">Ұяшықты таңдаңыз — әр ұяшықта үш бағыттан бір сұрақ</p>
+        </div>
+      </div>
+      <div class="board" id="board"></div>
+      <div class="board-foot">
+        <span>Бос орын — жауап, Esc — жабу</span>
+        <button class="chip" id="resetBoard">Тақтаны қайта ашу</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. Round 3 -->
+  <section class="slide" aria-label="III кезең">
+    <div class="inner">
+      <div class="head">
+        <span class="badge"><svg style="color:var(--lapis)"><use href="#star"/></svg><span>III</span></span>
+        <div>
+          <h2><span class="q">«</span>Парасат алаңы<span class="q">»</span></h2>
+          <p class="sub">Жағдаяттарды шешу: ұяшықты таңдаңыз</p>
+        </div>
+      </div>
+      <div class="cases" id="cases"></div>
+      <div class="cases-foot">
+        <span>Алдымен қатысушы шешім ұсынады, содан кейін ұсынылатын жауап ашылады</span>
+        <button class="chip" id="resetCases">Ұяшықтарды қайта ашу</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6. Closing -->
+  <section class="slide feature" aria-label="Қорытынды">
+    <div class="mihrab">
+      <p class="closing-ar ar" lang="ar">جَزَاكُمُ اللّٰهُ خَيْرًا</p>
+      <p class="closing-tr">Алла разы болсын!</p>
+      <h1 class="thanks">Көп рахмет!</h1>
+      <div class="star-rule"><svg aria-hidden="true"><use href="#star-line"/></svg></div>
+      <p class="closing-note">Білім мен ізгілік жолындағы еңбегі үшін барлық ұстаздарымызға шексіз алғыс білдіреміз.</p>
+      <span class="base"></span>
+    </div>
+  </section>
+
+</main>
+
+<nav class="bar" aria-label="Слайдтар">
+  <button class="nav-btn" id="prev" aria-label="Алдыңғы слайд">←</button>
+  <div class="dots" id="dots"></div>
+  <span class="count" id="count">1 / 6</span>
+  <button class="nav-btn" id="next" aria-label="Келесі слайд">→</button>
+  <button class="nav-btn fs" id="fs" aria-label="Толық экран (F)" title="Толық экран (F)">⛶</button>
+</nav>
+
+<div class="modal" id="modal" aria-hidden="true">
+  <div class="modal-card" role="dialog" aria-modal="true">
+    <div id="singleView">
+      <div class="m-meta"><span class="m-cat" id="mCat"></span><span class="m-pts" id="mPts"></span></div>
+      <p class="m-q" id="mQ"></p>
+      <div class="m-answer" id="mAns" hidden>
+        <span class="m-label" id="mLabel">Жауабы</span>
+        <p class="m-a" id="mA"></p>
+      </div>
+    </div>
+    <div id="cellView" hidden>
+      <div class="m-meta"><span class="m-cat">«Білім бәйгесі»</span><span class="m-pts" id="mCellNum"></span></div>
+      <ol class="cell-qs" id="cellQs"></ol>
+    </div>
+    <div class="m-actions">
+      <span class="hint">Бос орын — жауапты ашу, Esc — жабу</span>
+      <div class="btns">
+        <button class="btn primary" id="mReveal">Жауабын көрсету</button>
+        <button class="btn ghost" id="mClose">Жабу</button>
+      </div>
     </div>
   </div>
 </div>
 
 <script>
-const POINTS = [5, 10, 15, 20, 25];
-
-const CATEGORIES = [
-  {
-    name: "Пайғамбарлыққа дейінгі өмір мен алғашқы уахи",
-    q: [
-      { question: "Аллаһ елшісіне ﷺ алғашқы уахи қай үңгірде және қай айда түсті?", answer: "Хира үңгірінде, рамазан айында түсті." },
-      { question: "Пайғамбарымыздың ﷺ сүтанасы Халима қай тайпадан шыққан еді және сәби Мұхаммедті ﷺ үйіне алған соң қандай берекеге куә болды?", answer: "Бәну Сағд ибн Бәкр тайпасынан. Олардың құнаң тартқан, шөпсіз жердегі қойлары өрістен қарындары тойып, желіндері сүтке толып қайтатын болды." },
-      { question: "Пайғамбарымыздың ﷺ ардақты атасы Абдулмутталиб қайтыс болар сәтінде сегіз жасар немересін кімнің қамқорлығына табыстады?", answer: "Әкесінің туған бауыры, көкесі Әбу Талибке табыстады." },
-      { question: "Шам өлкесіндегі Бусра қаласында 12 жасар Мұхаммедті ﷺ пайғамбарлық мөрі мен ағаш-тастардың сәжде етуі арқылы танып, оны Меккеге кері қайтаруды ескерткен христиан монахы кім?", answer: "Монах Бахира." },
-      { question: "Пайғамбарымыз ﷺ 35 жасында Қағбаны қайта тұрғызу кезінде тайпалар арасында шыққан Қара тасты (Әл-Хажар әл-Әсуад) орнату дауын қалай шешті?", answer: "Ол ﷺ шапанын жайып, Қара тасты ортасына қойды да, әр рудың көсемдеріне шапанның шетінен ұстатып көтергізді, сосын тасты өз қолымен орнына қойды." }
-    ]
-  },
-  {
-    name: "Ашық дағуат, мүшріктердің қысымы және қоныс аудару",
-    q: [
-      { question: "«Ең жақын туыстарыңа ескерт» аяты түскен соң Пайғамбарымыз ﷺ қай төбеге шығып, құрайыш әулеттерін ашық түрде тозақ отынан сақтануға шақырды?", answer: "Сафа төбесіне шығып шақырды." },
-      { question: "Ислам тарихында Аллаһ жолында забір көріп, шәһид болған ең алғашқы адам кім?", answer: "Аммар ибн Ясирдің анасы Сумәййә (оны Әбу Жәһл найзамен шаншып өлтiрді)." },
-      { question: "Мұсылмандардың Эфиопияға алғашқы қоныс аударуы пайғамбарлықтың нешінші жылы болды және бұл топты кім бастап барды?", answer: "Пайғамбарлықтың 5-жылы ражаб айында болды; топты Осман ибн Аффан бастап барды." },
-      { question: "Эфиопия патшасы Нәжәшидің құзырында мұсылмандар атынан кім шешендікпен сөз сөйлеп, «Мәриям» сүресінің аяттарын оқып берді?", answer: "Жағфар ибн Әбу Талиб." },
-      { question: "Һашим мен Мутталиб әулеттерін үш жыл бойы аш-жалаңаш блокадада ұстаған әділетсіз хаттаманы Қағба ішінен алып, бұзуға муһажирлерге жасырын азық тасып жүрген қай меккелік азамат бастамашы болды?", answer: "Һишам ибн Амр." }
-    ]
-  },
-  {
-    name: "Һижра, Мәдинадағы алғашқы реформалар және бауырластық",
-    q: [
-      { question: "Пайғамбарымыз ﷺ Мәдинаға һижра жасау сапарында Әбу Бәкірмен (р.а.) бірге Меккеден шыққан соң қай үңгірде үш түн жасырынды?", answer: "Сәур үңгірінде." },
-      { question: "Ислам тарихында тақуалыққа негізделіп тұрғызылған ең алғашқы мешіт қай жерде бой көтерді?", answer: "Құба мешіті." },
-      { question: "Пайғамбарымыз ﷺ Мәдинаға келген соң Меккеден көшкен муһажирлер мен жергілікті ансарларды бір-бірімен бауырластырған тарихи жиын қай сахабаның үйінде өтті?", answer: "Әнәс ибн Мәликтің үйінде." },
-      { question: "Бірінші Ақаба антынан соң Мәдина тұрғындарына Ислам негіздерін, намаз бен Құранды үйрету үшін Пайғамбарымыз ﷺ жіберген ең алғашқы елші кім?", answer: "Мусғаб ибн Ғұмайр." },
-      { question: "Пайғамбарымыз ﷺ Мәдинаға қоныс аударған кезде ол шаһарда қоныстанған яһудитердің негізгі үш тайпасын атаңыз.", answer: "Бәну Қайнуқағ, Бәну Надир және Бәну Құрайза." }
-    ]
-  },
-  {
-    name: "Ұлы шайқастар (Бәдір және Ухуд)",
-    q: [
-      { question: "Һижраның 2-жылы орын алған Ұлы Бәдір шайқасында мұсылмандар мен мүшріктер әскерінің саны қанша еді?", answer: "Мұсылмандар 313 (не 314/317) сарбаз, ал мүшріктер 1000-ға жуық (бастапқыда 1300) жауынгер болды." },
-      { question: "Ухуд шайқасында Пайғамбарымыз ﷺ әскердің арқа жағын қорғау үшін «Садақшылар тауына» Абдуллаһ ибн Жубәйрдің басшылығымен неше мергенді орналастырды?", answer: "50 садақшыны." },
-      { question: "Бәдір шайқасында мүшріктердің басты қолбасшысы Әбу Жәһлді ауыр жаралап, жер жастандырған ансарлық екі жас батыр кімдер?", answer: "Афраның ұлдары — Муғаз ибн Амр және Муғаууиз ибн Афра." },
-      { question: "Ухуд шайқасында ерекше ерлікпен алысып, «Асадуллаһ» (Аллаһтың арыстаны) деген құрметті атаққа ие болған, Пайғамбарымыздың ﷺ көкесі әрі сүт бауыры саналатын сахаба кім еді?", answer: "Хамза ибн Абдулмутталиб — Ухуд шайқасында шейiт болды." },
-      { question: "Ухуд шайқасында Пайғамбарды ﷺ өз денесімен қорғап, оннан астам қылыш-найза жарақатын алып, саусақтары сал болып қалған батыр сахаба кім?", answer: "Талха ибн Ғұбайдуллаһ." }
-    ]
-  },
-  {
-    name: "Хандақ, Худайбия және Мекке жеңісі",
-    q: [
-      { question: "Хандақ (Ахзаб) жорығында қалаға лап қойған одақтастар әскерінен қорғану үшін Мәдинаның айналасына ор қазу идеясын ұсынған сахаба кім?", answer: "Салман әл-Фариси." },
-      { question: "Һижраның 6-жылы түзілген Худайбия келісімі бойынша мұсылмандар мен құрайыштар арасында соғыс неше жылға тоқтатылатын болып келісілді?", answer: "10 жылға соғыс тоқтатылды." },
-      { question: "Худайбияда Осман ибн Аффанның (р.а.) Меккеде өлімі туралы жалған хабар тарағанда, Пайғамбарымыз ﷺ сахабалардан ағаш түбінде алған серті тарихта қалай аталды?", answer: "«Ризашылық анты» (Бәйғат әр-ридуан)." },
-      { question: "Һижраның 8-жылы Меккені бағындыру (Мекке жеңісі) жорығына мұсылмандар қанша әскермен аттанды?", answer: "10 000 (он мың) сахабамен аттанды." },
-      { question: "Мекке жеңісі күні Пайғамбарымыз ﷺ Қағбаның кілтін оның бұрынғы сақтаушысы болған қай сахабаға мәңгілікке қайтарып берді?", answer: "Осман ибн Талхаға." }
-    ]
-  }
+/* ============ CONTENT: edit questions and answers here ============ */
+const CAT_LABELS = { trad:"Дін мен дәстүр", hist:"Қазақстан тарихы", fiqh:"Фиқһ" };
+const CELLS = [
+  { trad:{ q:"Қазақ дәстүрінде босанған әйелге арнайы сойылатын мал қалай аталады?", a:"Қалжа" },
+    hist:{ q:"Ханның кеңесшілері болған, ел ішіндегі дауларды шешкен адамдар кімдер?", a:"Билер" },
+    fiqh:{ q:"Некесіз ЭКО жасату үкімі?", a:"Некесіз ЭКО жасату харам, зина үкімінде болады." } },
+  { trad:{ q:"Қалжаның негізгі мақсаты қандай?", a:"Жас ананың күш-қуатын қалпына келтіру және күтім жасау" },
+    hist:{ q:"Қазақ қоғамындағы әскери қызмет атқарған адамдар қалай аталды?", a:"Батырлар" },
+    fiqh:{ q:"Мәйітті негізсіз көшіру үкімі қандай?", a:"Ешбір себепсіз жерленген мәйітті қайта қазып алып, екінші бір жерге жерлеуге шариғат тыйым салады." } },
+  { trad:{ q:"Қазақ дәстүрінде жас анаға қалжа әкелу негізінен кімнің міндеті саналған?", a:"Күйеуінің" },
+    hist:{ q:"Қазақ хандығының құрылуына байланысты аталатын Моғолстан ханы кім?", a:"Есен Бұға" },
+    fiqh:{ q:"Лотерея ойындарының үкімі қандай?", a:"Лотереяның кез-келген түрі құмарға жататындықтан үкімі үзілді-кесілді харам саналады." } },
+  { trad:{ q:"Қыз ұзатылған кезде үлкендердің қызға бата беруінің мақсаты қандай?", a:"Оған бақыт тілеп, жаңа отбасылық өміріне рухани қолдау көрсету" },
+    hist:{ q:"Қасымханның қасқа жолы кімнің тұсында қалыптасты?", a:"Қасымханның тұсында" },
+    fiqh:{ q:"Тауар сатып алу үшін кепіл ақша берсе, кейін затты сатып алмаса, кепіл ақша кімде қалады?", a:"Кепіл ақша иесіне қайтарылып берілу керек." } },
+  { trad:{ q:"Қыздың тұрмысқа шыққанда өзімен бірге алып баратын дүние-мүлкі қалай аталады?", a:"Жасау" },
+    hist:{ q:"Есім ханның ескі жолы дегеніміз не?", a:"Есімханның тұсында жүйеленген дәстүрлі заңдар жинағы" },
+    fiqh:{ q:"Форекс нарығы шариғатта қалай бағаланады?", a:"Форекс саудасында өсім, құмар, біреудің малын харам жолмен жеу орын алғандықтан онымен айналысуға болмайды." } },
+  { trad:{ q:"Қазақ дәстүрінде қыздың жасауын кім дайындаған?", a:"Қыздың ата-анасы, әсіресе төркіні" },
+    hist:{ q:"Жеті жарғыны қалыптастырған кім?", a:"Тәуке хан" },
+    fiqh:{ q:"Жасанды шаш трансплантациясы үкімі?", a:"Табиғи шашты адамның өз денесінен алып, бастың таз аймағына отырғызуға рұқсат." } },
+  { trad:{ q:"Мәһір дегеніміз не?", a:"Күйеу жігіттің тұрмысқа шыққан әйелге беретін жеке сыйы" },
+    hist:{ q:"Қазақтың үш биін атаңыз.", a:"Төле би, Әйтеке би, Қазбек би" },
+    fiqh:{ q:"Мәйіттің денесін себепсіз тілу үкімі қандай?", a:"Мәйіттің денесін ешбір себепсіз тілу — харам. Мәйіттің денесін ауруды зерттеп, оған дауа табу, білімді арттыру және адамның ішкі ағзаларын таныту мақсатында тілуге рұқсат." } },
+  { trad:{ q:"Қалыңмал мен мәһірдің негізгі айырмашылығы неде?", a:"Қалыңмал қыздың ата-анасына берілсе, мәһір әйелдің өзіне тиесілі" },
+    hist:{ q:"Абылайханның шын есімі кім?", a:"Әбілмансұр" },
+    fiqh:{ q:"Жұма күні ғұсыл құйынудың үкімі?", a:"Сүннет." } },
+  { trad:{ q:"Қазақ дәстүріндегі «сырға салу» қандай жағдайға байланысты жасалады?", a:"Қызды айттыруға, екі жақтың құда болуына байланысты" },
+    hist:{ q:"Қазақ хандығы қай ғасырда құрылды?", a:"XV ғасырда" },
+    fiqh:{ q:"Азаматтық некенің үкімі қандай?", a:"Ресми тіркелмеген және мұсылманша неке қиылмаған адамның некесі — зина болып табылады. Азаматтық некенің үкімі — харам." } },
+  { trad:{ q:"Айттырылған қыз қалай аталады?", a:"Қалыңдық" },
+    hist:{ q:"Қазақтың тұңғыш педагогі ретінде танылған тұлға кім?", a:"Ыбырай Алтынсарин" },
+    fiqh:{ q:"Азанның үкімі қандай?", a:"Бекітілген сүннет." } },
+  { trad:{ q:"Жаңа түскен келіннің бетін ашып, туыстарымен таныстыратын дәстүр қалай аталады?", a:"Беташар" },
+    hist:{ q:"Қазақтың ұлы ақыны, ойшылы, қара сөздердің авторы кім?", a:"Абай Құнанбаев" },
+    fiqh:{ q:"Зекет алушылар неше топқа бөлінеді?", a:"8 топқа бөлінеді: пақырлар, міскіндер, зекет жинаушылар, Ислам дініне жаңа кіргендер, құл азат ету, қарызы бар адамдар, Алла жолындағылар, қолында ақшасы жоқ, еліне жете алмай тұрған жолаушылар." } },
+  { trad:{ q:"Қазақ дәстүрінде қыздың некеге тұруына байланысты қандай діни рәсім бар?", a:"Неке қию" },
+    hist:{ q:"Қазақстанның тұңғыш ғалымдарының бірі, саяхатшы және этнограф кім?", a:"Шоқан Уәлиханов" },
+    fiqh:{ q:"Ифрад қажылығы дегеніміз не?", a:"Умраны қоспай қажылық қана жасау." } },
+  { trad:{ q:"Исламда әйелдің отбасындағы маңызды қасиеттерінің бірі қандай?", a:"Көркем мінез және әдептілік" },
+    hist:{ q:"Алаш қозғалысының жетекшісі кім?", a:"Алихан Бөкейхан" },
+    fiqh:{ q:"Қажылықта шайтанға лақтыратын тастың жалпы саны қанша?", a:"70 тас. Төртінші күні лақтырылмаса, 49 тас." } },
+  { trad:{ q:"Қазақ дәстүрінде жеті атаға дейін қыз алыспаудың мақсаты қандай?", a:"Туыстық байланысты сақтау және ұрпақ саулығын ойлау" },
+    hist:{ q:"Қазақстан мемлекетінің егемендігі туралы декларация қай жылы қабылданды?", a:"1990 жылы 25 қазан" },
+    fiqh:{ q:"Қай уақытта сәһу сәждесін жасауға рұқсат етілмейді?", a:"Таң намазында сәлем бергеннен кейін күн шығып кетсе, екінті намазынан кейін сәлем бергеннен кейін намазды бұзатын жағдай (әдейі дәретті бұзу сияқты) орын алған болса, жұма мен айт намаздарында." } },
+  { trad:{ q:"«Беташар» дәстүрінде қазақ қоғамындағы әйелдің қандай рөлі ерекше көрсетіледі?", a:"Отбасын ұйыстыру, бала тәрбиесі, үлкенді сыйлау және көркем әдепті сақтау" },
+    hist:{ q:"Отырар қаласы қай өзеннің бойында орналасқан?", a:"Сырдария өзенінің бойында" },
+    fiqh:{ q:"Қарыз беру қашан мәкруһ болады?", a:"Қарыз беру харам іске жұмсайтыны белгілі адамға қарыз беру мәкрүһ." } }
 ];
 
-const grid = document.getElementById('grid');
+const CASES = [
+  { q:"Туыла сала шетінеген сәбиге қатысты не айтасыз?",
+    a:"Егер туылған балада тіршілік нышаны байқалып, сосын шетінесе, балаға ат қойылады, жуындырылып, кебінделіп, жаназа намазы оқылады." },
+  { q:"Медитация жасауға болады ма?",
+    a:"Қазіргі таңда индуизм мен буддизмнің негізі болып табылатын медитация түрі — Ислам дініне қайшы. Өйткені онда индуизм мен буддизмнің құлшылық түрі әрі Алла Тағалаға серік қосу бар. Сондықтан шариғатымызда ондай медитация түріне қатаң түрде тыйым салынады. Сондай-ақ бұл жерде басқа қауымға еліктеу бар. Пайғамбарымыз (оған Алланың салауаты мен сәлемі болсын): «Кім бір қауымға ұқсаса, ол — солардан», — деген. Ислам дінінде өзге дінге еліктеп, ұқсауға болмайды." },
+  { q:"Қыз алып қашудың үкімі қандай?",
+    a:"Харам, қылмыс. Қыздың және оның уәлиінің разылығысыз неке жарамсыз. ҚМДБ: бұл — дәстүр емес, зорлық." },
+  { q:"Науқастан реанимациялық жабдықтарды ажыратудың үкімі қандай?",
+    a:"Болмайды. 3 білікті дәрігер «миы толық өлді, жүрек аппаратпен ғана соғып тұр» деп шешсе ғана аппаратты ажыратуға рұқсат. Әдейі дәрі салып өлтіру — адам өлтірумен тең." },
+  { q:"Ғидда мерзіміндегі әйелге үйленудің үкімі қандай?",
+    a:"Харам, некесі өтпейді. Әйел иддасын толық бітіруі керек. Үйленіп қойса, дереу ажырасып, идда біткен соң қайта неке қию керек." },
+  { q:"Қарызды уақытында қайтармау күнә ма?",
+    a:"Жалпы қарыз алғаннан кейін оны уақытысында өтеу керек. Қарызды өтеуге мүмкіндігі бола тұра кешіктіруге болмайды. Сондықтан қарызды өтеуге шамасы келе тұра уақытысынан кешіктіру күнә саналады." },
+  { q:"Жасанды кірпік және тырнақ жалғаудың үкімі қандай?",
+    a:"Болмайды. Су өткізбейді, дәрет, ғұсыл өтпейді. Сонымен қатар алдау және жаратылысты өзгерту бар." },
+  { q:"Тырнақты бояу (маникюр) үкімі қандай?",
+    a:"Әйелдің шариғат шеңберінде сәнденуіне рұқсат, бірақ тырнақ лагының құрамында су өткізбейтін қоспалар болғандықтан, ол ғұсыл мен дәретке кедергі болады. Мұндай бояу жағылған адамның дәреті мен ғұсылы дұрыс емес, сондықтан бояуды кетіріп, дәретті немесе ғұсылды қайта алу міндетті." },
+  { q:"Жасанды түсік жасатудың үкімі қандай?",
+    a:"120 күннен (4 ай, жан кіргеннен) кейін — мүлдем харам. 120 күнге дейін тек ананың өміріне қауіп төнгенде, зорлықтан жүкті болғанда немесе баланың жаратылысында ауыр ақау болса ғана рұқсат." },
+  { q:"Сюцай жүйесінің үкімі қандай?",
+    a:"Сюцай жүйесінде сандар болжамына сеніп, Алланың құдіретіне шәк келтіру және адамның тағдырын болжау харам. Мұсылман тағдырға иман келтіріп, жақсылық пен жамандықтың бәрі Алладан екеніне сеніп, болашақты болжайтын наным-сенімдерден аулақ жүруі тиіс." },
+  { q:"Емізулі сәбидің зәрі нәжасқа жата ма?",
+    a:"Иә, емізулі сәбидің зәрі ауыр нәжасқа жатады. Мейлі ол нәресте қыз болсын, ұл болсын, екеуінің үкімі бірдей." },
+  { q:"Екі сәжде арасында «Аллаһуммағ-фир ли» деп айтыла ма?",
+    a:"Екі сәжде арасында сүннет болған зікір жоқ. Егер солай айтатын болса, мәкрүһ болмайды. Бірақ ол сүннет амал ретінде жасалмайды, яғни мұстахаб." },
+  { q:"Бір адамның екі үйі болса, қайсы үйі оған негізгі мекен болады?",
+    a:"Қайсы үйінде отбасымен немесе жалғыз тұрса, сол оның негізгі мекені болады. Екінші үйіне барғанда, бірінші үйімен екінші үйі арасында сапар қашықтығы болса, намаздарын қысқартып оқиды. Ал егер екі үйінде екі әйелі болса, намаздарын толық оқиды." },
+  { q:"Вахтада 20 күн жұмыс жасаймын, жұмыста 14 күн болғанымда үйіме 1 күнге барып келемін, осы күндерім сапар үкімінде бола ма?",
+    a:"Егер үйден шыққанда 20 күнді ниет етіп шықсаңыз, намазды толық оқисыз. Ал егер 14 күннен соң қайтамын деп ниет етіп шықсаңыз, намазды қысқартып оқисыз. Бұл мәселеде ниетке қаралады. Ниет еткенде «14 күн жұмыста боламын» деген ниет болуы керек." },
+  { q:"Шашты транспланттау жайлы шариғат не дейді?",
+    a:"Табиғи шашты адамның өз денесінен алып, бастың таз аймағына отырғызуға рұқсат. Өзге адамның шашын егуге тек зәрулік жағдайда ғана рұқсат етіледі. Алайда адам шашын саудаға салуға болмайды, ол — харам. Түсіп қалатын шашты көзбояушылық мақсатында отырғызуға болмайды. Жасанды шаш транспланттау адамның бас терісіне зиян тигізбесе әрі кемшілікті жоюдың басқа жолы болмаса, бұл әдіске рұқсат етіледі." }
+];
 
-CATEGORIES.forEach((cat, catIdx) => {
-  const label = document.createElement('div');
-  label.className = 'cat-label';
-  label.textContent = cat.name;
-  grid.appendChild(label);
+/* ============ Slides ============ */
+const deck = document.getElementById('deck');
+const slides = [...deck.querySelectorAll('.slide')];
+const dotsEl = document.getElementById('dots');
+const countEl = document.getElementById('count');
+const prevBtn = document.getElementById('prev');
+const nextBtn = document.getElementById('next');
+let cur = 0;
 
-  POINTS.forEach((pt, colIdx) => {
-    const cell = document.createElement('button');
-    cell.className = `cell col-${colIdx}`;
-    cell.setAttribute('data-cat', catIdx);
-    cell.setAttribute('data-col', colIdx);
-    cell.innerHTML = `<span class="points">${pt}</span><span class="checkmark">✓</span>`;
-    cell.addEventListener('click', () => openCell(catIdx, colIdx, cell));
-    grid.appendChild(cell);
+slides.forEach((s,i)=>{
+  const d = document.createElement('button');
+  d.className = 'dot';
+  d.setAttribute('aria-label', (i+1) + '-слайд');
+  d.addEventListener('click', ()=>go(i));
+  dotsEl.appendChild(d);
+});
+const dots = [...dotsEl.children];
+
+function go(i){
+  i = Math.max(0, Math.min(slides.length-1, i));
+  slides.forEach((s,k)=>{
+    s.classList.toggle('active', k===i);
+    s.classList.toggle('before', k<i);
+    s.setAttribute('aria-hidden', k!==i);
+    s.inert = k!==i;
   });
-});
-
-const overlay = document.getElementById('overlay');
-const modalCat = document.getElementById('modalCat');
-const modalPoints = document.getElementById('modalPoints');
-const modalQuestion = document.getElementById('modalQuestion');
-const modalAnswer = document.getElementById('modalAnswer');
-const modalAnswerText = document.getElementById('modalAnswerText');
-const revealBtn = document.getElementById('revealBtn');
-const closeBtn = document.getElementById('closeBtn');
-
-let activeCell = null;
-
-function openCell(catIdx, colIdx, cellEl){
-  if (cellEl.classList.contains('opened')) return;
-  activeCell = cellEl;
-  const cat = CATEGORIES[catIdx];
-  const item = cat.q[colIdx];
-  modalCat.textContent = cat.name;
-  modalPoints.textContent = POINTS[colIdx] + ' ұпай';
-  modalQuestion.textContent = item.question;
-  modalAnswerText.textContent = item.answer;
-  modalAnswer.classList.remove('show');
-  revealBtn.style.display = 'inline-block';
-  overlay.classList.add('show');
+  dots.forEach((d,k)=>d.setAttribute('aria-current', k===i));
+  cur = i;
+  countEl.textContent = (i+1) + ' / ' + slides.length;
+  prevBtn.disabled = i===0;
+  nextBtn.disabled = i===slides.length-1;
+  slides[i].scrollTop = 0;
 }
+prevBtn.addEventListener('click', ()=>go(cur-1));
+nextBtn.addEventListener('click', ()=>go(cur+1));
+document.querySelectorAll('[data-go]').forEach(b=>b.addEventListener('click', ()=>go(+b.dataset.go)));
 
-revealBtn.addEventListener('click', () => {
-  modalAnswer.classList.add('show');
-  revealBtn.style.display = 'none';
-});
+/* Fullscreen */
+function toggleFS(){
+  try{
+    const d = document, el = d.documentElement;
+    if(!(d.fullscreenElement || d.webkitFullscreenElement)){
+      const p = el.requestFullscreen ? el.requestFullscreen() : (el.webkitRequestFullscreen && el.webkitRequestFullscreen());
+      if(p && p.catch) p.catch(()=>{});
+    } else {
+      const p = d.exitFullscreen ? d.exitFullscreen() : (d.webkitExitFullscreen && d.webkitExitFullscreen());
+      if(p && p.catch) p.catch(()=>{});
+    }
+  }catch(e){}
+}
+document.getElementById('fs').addEventListener('click', toggleFS);
 
+/* Swipe */
+let sx = null, sy = null;
+deck.addEventListener('touchstart', e=>{
+  if(modalOpen) return;
+  const t = e.touches[0]; sx = t.clientX; sy = t.clientY;
+}, {passive:true});
+deck.addEventListener('touchend', e=>{
+  if(sx===null) return;
+  const t = e.changedTouches[0];
+  const dx = t.clientX - sx, dy = t.clientY - sy;
+  sx = null;
+  if(Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy)*1.3) go(cur + (dx<0 ? 1 : -1));
+}, {passive:true});
+
+/* ============ Modal ============ */
+const modal = document.getElementById('modal');
+const singleView = document.getElementById('singleView');
+const cellView = document.getElementById('cellView');
+const mCat = document.getElementById('mCat'), mPts = document.getElementById('mPts');
+const mQ = document.getElementById('mQ'), mA = document.getElementById('mA');
+const mAns = document.getElementById('mAns'), mLabel = document.getElementById('mLabel');
+const mCellNum = document.getElementById('mCellNum'), cellQs = document.getElementById('cellQs');
+const mReveal = document.getElementById('mReveal');
+let modalOpen = false, lastFocus = null, cellMode = false;
+
+function openModal({cat, pts, q, a, label}){
+  lastFocus = document.activeElement;
+  cellMode = false;
+  singleView.hidden = false; cellView.hidden = true;
+  mCat.textContent = cat; mPts.textContent = pts;
+  mQ.textContent = q; mA.textContent = a; mLabel.textContent = label;
+  mAns.hidden = true; mReveal.hidden = false; mReveal.textContent = 'Жауабын көрсету';
+  modal.classList.add('open'); modal.setAttribute('aria-hidden','false');
+  modalOpen = true;
+  setTimeout(()=>mReveal.focus(), 50);
+}
+function openCellModal(i){
+  lastFocus = document.activeElement;
+  cellMode = true;
+  singleView.hidden = true; cellView.hidden = false;
+  mCellNum.textContent = (i+1) + '-ұяшық';
+  cellQs.innerHTML = '';
+  const cell = CELLS[i];
+  ['trad','hist','fiqh'].forEach(key=>{
+    const item = cell[key];
+    if(!item) return;
+    const li = document.createElement('li');
+    const catEl = document.createElement('span'); catEl.className = 'cell-cat'; catEl.textContent = CAT_LABELS[key];
+    const qEl = document.createElement('p'); qEl.className = 'cell-q'; qEl.textContent = item.q;
+    const aEl = document.createElement('p'); aEl.className = 'cell-a'; aEl.hidden = true; aEl.textContent = 'Жауабы: ' + item.a;
+    li.append(catEl, qEl, aEl);
+    cellQs.appendChild(li);
+  });
+  mReveal.hidden = false; mReveal.textContent = 'Дұрыс жауабы';
+  modal.classList.add('open'); modal.setAttribute('aria-hidden','false');
+  modalOpen = true;
+  setTimeout(()=>mReveal.focus(), 50);
+}
+function isRevealed(){
+  return cellMode ? cellQs.querySelectorAll('.cell-a[hidden]').length === 0 : !mAns.hidden;
+}
+function reveal(){
+  if(cellMode) cellQs.querySelectorAll('.cell-a').forEach(el=>el.hidden = false);
+  else mAns.hidden = false;
+  mReveal.hidden = true;
+  document.getElementById('mClose').focus();
+}
 function closeModal(){
-  overlay.classList.remove('show');
-  if (activeCell){
-    activeCell.classList.add('opened');
-    activeCell = null;
-  }
+  modal.classList.remove('open'); modal.setAttribute('aria-hidden','true');
+  modalOpen = false;
+  if(lastFocus) lastFocus.focus();
 }
+mReveal.addEventListener('click', reveal);
+document.getElementById('mClose').addEventListener('click', closeModal);
+modal.addEventListener('click', e=>{ if(e.target===modal) closeModal(); });
 
-closeBtn.addEventListener('click', closeModal);
-overlay.addEventListener('click', (e) => {
-  if (e.target === overlay) closeModal();
+/* ============ Round 2 board ============ */
+const board = document.getElementById('board');
+function buildBoard(){
+  board.innerHTML = '';
+  CELLS.forEach((c,i)=>{
+    const b = document.createElement('button');
+    b.className = 'cell'; b.textContent = i+1;
+    b.setAttribute('aria-label', (i+1) + '-ұяшық');
+    b.addEventListener('click', ()=>{
+      b.classList.add('used');
+      openCellModal(i);
+    });
+    board.appendChild(b);
+  });
+}
+buildBoard();
+document.getElementById('resetBoard').addEventListener('click', buildBoard);
+
+/* ============ Round 3 cases ============ */
+const casesEl = document.getElementById('cases');
+function buildCases(){
+  casesEl.innerHTML = '';
+  CASES.forEach((c,i)=>{
+    const b = document.createElement('button');
+    b.className = 'case';
+    b.setAttribute('aria-label', (i+1) + '-жағдаят');
+    b.innerHTML = '<svg viewBox="0 0 100 100" aria-hidden="true"><use href="#star-line"/></svg><span class="n">'+(i+1)+'</span><span class="t">жағдаят</span>';
+    b.addEventListener('click', ()=>{
+      b.classList.add('used');
+      openModal({cat:'«Парасат алаңы»', pts:(i+1) + '-жағдаят', q:c.q, a:c.a, label:'Ұсынылатын шешім'});
+    });
+    casesEl.appendChild(b);
+  });
+}
+buildCases();
+document.getElementById('resetCases').addEventListener('click', buildCases);
+
+/* ============ Keyboard ============ */
+document.addEventListener('keydown', e=>{
+  if(e.altKey || e.ctrlKey || e.metaKey) return;
+  if(modalOpen){
+    if(e.key==='Escape'){ e.preventDefault(); closeModal(); }
+    else if(e.key===' ' || e.key==='Enter'){
+      e.preventDefault();
+      isRevealed() ? closeModal() : reveal();
+    }
+    return;
+  }
+  switch(e.key){
+    case 'ArrowRight': case 'PageDown': case ' ':
+      e.preventDefault(); go(cur+1); break;
+    case 'ArrowLeft': case 'PageUp':
+      e.preventDefault(); go(cur-1); break;
+    case 'Home': e.preventDefault(); go(0); break;
+    case 'End': e.preventDefault(); go(slides.length-1); break;
+    case 'f': case 'F': case 'а': case 'А':
+      e.preventDefault(); toggleFS(); break;
+  }
 });
-document.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape' && overlay.classList.contains('show')) closeModal();
-});
+
+go(0);
 </script>
 </body>
 </html>
