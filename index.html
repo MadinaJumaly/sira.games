@@ -615,7 +615,7 @@ function buildCases(){
     b.innerHTML = '<svg viewBox="0 0 100 100" aria-hidden="true"><use href="#star-line"/></svg><span class="n">'+(i+1)+'</span><span class="t">жағдаят</span>';
     b.addEventListener('click', ()=>{
       b.classList.add('used');
-      openModal({cat:'«Парасат алаңы»', pts:(i+1) + '-жағдаят', q:c.q, a:c.a, label:'Ұсынылатын шешім'});
+      openModal({cat:'«Парасат алаңы»', pts:(i+1) + '-жағдаят', q:c.q, a:c.a, label:'Үкімі'});
     });
     casesEl.appendChild(b);
   });
